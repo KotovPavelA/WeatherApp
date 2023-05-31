@@ -21,19 +21,19 @@ class WeatherViewModel @Inject constructor(
     var state by mutableStateOf(WeatherState())
         private  set
 
-    fun  loadWeatherInfo(){
+    fun loadWeatherInfo() {
         viewModelScope.launch {
             state = state.copy(
                 isLoading = true,
                 error = null
             )
             locationTracker.getCurrentLocation()?.let { location ->
-                when(val result = repository.getWeatherData(location.latitude, location.longitude)){
+                when(val result = repository.getWeatherData(location.latitude, location.longitude)) {
                     is Resource.Success -> {
-                        state.copy(
+                        state = state.copy(
                             weatherInfo = result.data,
                             isLoading = false,
-                            error =  null
+                            error = null
                         )
                     }
                     is Resource.Error -> {
@@ -43,12 +43,12 @@ class WeatherViewModel @Inject constructor(
                             error = result.message
                         )
                     }
-                } ?: kotlin.run {
-                    state = state.copy(
-                        isLoading = false,
-                        error = "Couldn't retrieve location. Make sure for grand permission and enable gps"
-                    )
                 }
+            } ?: kotlin.run {
+                state = state.copy(
+                    isLoading = false,
+                    error = "Couldn't retrieve location. Make sure to grant permission and enable GPS."
+                )
             }
         }
     }
